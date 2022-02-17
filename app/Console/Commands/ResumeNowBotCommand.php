@@ -6,6 +6,7 @@ use App\Models\Title;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ResumeNowBotCommand extends Command
@@ -71,32 +72,54 @@ class ResumeNowBotCommand extends Command
         ];
 
 
-        $title = $alphabet[0];
+//        $title = $alphabet[0];
+
+//        $this->getLastTitle();
+        $title = 'authorizy';
         $true = true;
         while ($true){
-            dump($title);
-            $request = $this->request($title);
+            try {
+                $this->info($title);
+                $request = $this->request($title);
 
-            if (is_array($json = $request->json())){
-                if (count($json) == 10){
-                    $title .= $alphabet[0];
-
-                }else{
-                    $lastElement = substr($title, -1);
-                    if ($lastElement == 'z'){
-                        $title = Str::replaceLast($lastElement, '', $title);
+                if (is_array($json = $request->json())){
+                    if (count($json) == 10){
+                        $title .= $alphabet[0];
+                    }else{
                         $lastElement = substr($title, -1);
-                    }
-                    $nextElement = array_search($lastElement, $alphabet) + 1;
-                    $title = Str::replaceLast($lastElement, $alphabet[$nextElement], $title);
-                }
 
-                $this->insertJobTitle($json);
+                        while ($lastElement == 'z'){
+                            $title = Str::replaceLast($lastElement, '', $title);
+                            $lastElement = substr($title, -1);
+                        }
+
+                        $nextElement = array_search($lastElement, $alphabet) + 1;
+
+                        $title = Str::replaceLast($lastElement, $alphabet[$nextElement], $title);
+                    }
+
+                    $this->setLastTitle($title);
+                    $this->insertJobTitle($json);
+                }
+                if ($title == 'zz'){
+                    $true = false;
+                }
+            }catch (\Exception $exception){
+                Log::info('ERROR: '. $exception->getMessage());
+                $title = $this->getLastTitle();
+                continue;
             }
-            if ($title == 'zz'){
-                $true = false;
-            }
+
         }
+    }
+
+    public function getLastTitle(){
+        return Storage::disk('public')->get('title.txt');
+    }
+
+    public function setLastTitle($title)
+    {
+        Storage::disk('public')->put('title.txt', $title);
     }
 
     public function insertJobTitle($items){
