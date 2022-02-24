@@ -80,20 +80,17 @@ class ResumeNowBotDescriptionCommand extends Command
                                 'title' => $title,
                                 'description' => $text
                             ]);
-                            dump($des->toArray());
+                            $this->info($title.' - '.$text);
+//                            dump($des->toArray());
                         }
                     }
 
                 }
 
             } catch (\Exception $e) {
-
+                $this->error($e->getMessage());
             }
-
-
-
-
-            sleep(rand(1,3));
+            sleep(rand(0,2));
         }
     }
 
