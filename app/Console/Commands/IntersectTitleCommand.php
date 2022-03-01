@@ -65,15 +65,13 @@ class IntersectTitleCommand extends Command
             foreach ($descriptions as $description){
 
                 $array = Description::where('description', $description)->pluck('title')->toArray();
-                if (true){
-                    if ($count == 0){
-                        $array_intersect = $array;
-                    }else{
-                        $array_intersect = array_intersect($array_intersect, $array);
-                    }
-//                    $titleArray[] = $array;
-                    $count = 1;
+                if ($count == 0){
+                    $array_intersect = $array;
+                }else{
+                    $array_intersect = array_intersect($array_intersect, $array);
                 }
+//                    $titleArray[] = $array;
+                $count = 1;
             }
 //            $array_intersect = array_intersect(implode(',',$titleArray));
 
