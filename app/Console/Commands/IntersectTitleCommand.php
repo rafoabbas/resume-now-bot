@@ -51,6 +51,7 @@ class IntersectTitleCommand extends Command
         $group = [];
         foreach ($titles as $key => $title){
 
+            $this->info($title);
             if (IntersectTitle::where('title', $title)->count() > 0){
                 continue;
             }
