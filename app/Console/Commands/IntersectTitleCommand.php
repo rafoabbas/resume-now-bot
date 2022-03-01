@@ -3,11 +3,13 @@
 namespace App\Console\Commands;
 
 use App\Models\Description;
+use App\Models\IntersectTitle;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
+use Psy\Util\Str;
 
-class IntersectTitle extends Command
+class IntersectTitleCommand extends Command
 {
     /**
      * The name and signature of the console command.
@@ -48,6 +50,11 @@ class IntersectTitle extends Command
 
         $group = [];
         foreach ($titles as $key => $title){
+
+            if (IntersectTitle::where('title', $title)->count() > 0){
+                continue;
+            }
+
             $titleArray = [];
 
             $descriptions = Description::where('title', $title)->pluck('description')->toArray();
@@ -71,13 +78,20 @@ class IntersectTitle extends Command
 
 //            dd($array_intersect);
 
-            dump($array_intersect);
-            $group[$key] = $array_intersect;
+            $uuid = \Illuminate\Support\Str::uuid();
 
-            if ($key == 20){
-//                dd($group);
-                die;
+            foreach ($array_intersect as $intersectTitle){
+                IntersectTitle::create([
+                    'group_id' => $uuid,
+                    'title' => $intersectTitle,
+                ]);
             }
+
+
+//            if ($key == 20){
+////                dd($group);
+//                die;
+//            }
 
         }
     }
